@@ -21,11 +21,11 @@ function saveSeatsModelToLocalStorage() {
   // funzione che dal localst. acquisisce i posti selezionati
 function getSeatsModelFromLocalStorage() {
     const modelString = localStorage.getItem('seatsModel');
-    if (modelString) {
+    if (modelString) { // e' true quando non è vuoto
         let modelFromLocalStorage = JSON.parse(modelString);
         return modelFromLocalStorage;
     }
-    return {};
+    return {}; // oggetto vuoto
 
 }
 // salvo nel localSt. l'id dell'ultimo film seleionato
@@ -56,8 +56,8 @@ function populateFilmSelector() {
         
     });
 }
-
-function findFilmPriceById(filmId) {
+// funzione che tramite l'id trova il prezzo del film
+function findFilmPriceById(filmId) { 
     for (i = 0; i < filmModel.length; i++) {
         if (filmModel[i].id === filmId) {
         return filmModel[i].price;
@@ -65,7 +65,45 @@ function findFilmPriceById(filmId) {
     }
 
 } 
+function showTotalInfo(filmId) {
+    const selectedSeats = seatsModel[filmId].seats;
+    document.getElementById("count").innerText = selectedSeats.length;
+    const totalCost = findFilmPriceById(filmId) * selectedSeats.length;
+    document.getElementById("total").innerText = totalCost;
+}
+
+function selectFilm(filmId) {
+    movieSelect.value = filmId;
+    markSeats(filmId);
+
+    
+}
+
+function resetSeats() {
+    for (i = 0; i < availableSeats.length; i ++) {
+        availableSeats[i].classList.remove("selected");
+    }
+}   
+
+function markSeats(filmId) { // funzione che mette i posti selezionati
+    resetSeats();
+    if (seatsModel[filmId]) { // seasModel non e' vuoto allora procedi
+        const selectedSeats = seatsModel[filmId].seats; // è possibile che seatsModel sia vuoto!! (bisogna supportare questo caso)
+        for (i= 0; i < selectedSeats.length; i++ ) {
+            availableSeats[selectedSeats[i]].classList.add("selected"); // rivedi seleziona gli oggetti in base alle classi
+        }
+    } 
+}
 // inizio 
 let selectedFilmId = getSelectedFilmIdFromLocalStorage();
 const seatsModel = getSeatsModelFromLocalStorage();
 populateFilmSelector();
+const availableSeats =  document.querySelectorAll(".container .seat"); // prendiamo tutti gli elementi di classe seat che sono contenuti in oggetti di classe container
+selectFilm(selectedFilmId);
+
+movieSelect.onchange = function() {
+    
+    selectedFilmId = +movieSelect.value;
+    saveFilmIdToLocalStorage();
+    markSeats();
+}
