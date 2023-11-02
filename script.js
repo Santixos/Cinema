@@ -131,9 +131,22 @@ const filmModel = [
         if (seatsModel[selectedFilmId]) // verifica che esita l'id del film nel seatsmodel se c'è aggiungi il posto, se non c'è aggiungi l'id film
         // cambiare il modello e salvare nel local st
         {
-            console.log(numberOfSeat);
-            seatsModel[selectedFilmId].seats.push(numberOfSeat);
+           
+            if(!seatsModel[selectedFilmId].seats.includes(numberOfSeat)) {
+                seatsModel[selectedFilmId].seats.push(numberOfSeat);
+            } else {
+                
+                const indexToRemove = seatsModel[selectedFilmId].seats.indexOf(numberOfSeat); // Trova l'indice dell'elemento 27
+
+                    if (indexToRemove !== -1) {
+                    // Verifica se l'elemento 27 è stato trovato nell'array
+                    seatsModel[selectedFilmId].seats.splice(indexToRemove, 1); // Rimuovi 1 elemento a partire dall'indice indexToRemove
+                }   
+
+            }
+        
         } else {
+
             seatsModel[selectedFilmId] = {seats: [numberOfSeat]};
         }
         showTotalInfo(selectedFilmId);
