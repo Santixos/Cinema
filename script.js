@@ -139,7 +139,7 @@ const filmModel = [
                 const indexToRemove = seatsModel[selectedFilmId].seats.indexOf(numberOfSeat); // Trova l'indice dell'elemento 27
 
                     if (indexToRemove !== -1) {
-                    // Verifica se l'elemento 27 è stato trovato nell'array
+                    // Verifica se l'elemento è stato trovato nell'array
                     seatsModel[selectedFilmId].seats.splice(indexToRemove, 1); // Rimuovi 1 elemento a partire dall'indice indexToRemove
                 }   
 
