@@ -7,6 +7,8 @@ const filmModel = [
   ]
   const movieSelect = document.getElementById('movie');
   //salva il modello dei posti selezionati nel local st.
+  const showtimeInput = document.getElementById("time");
+  const dateInput = document.getElementById("datepicker");  
   function saveSeatsModelToLocalStorage() {
       localStorage.setItem('seatsModel',JSON.stringify(seatsModel));
     }
@@ -70,7 +72,7 @@ const filmModel = [
     let totalPrice = 0;
   
     if (seatsModel[filmId]) {
-        totalSeats = seatsModel[filmId].seats.length;
+        totalSeats = seatsModel[filmId][showDateTime].seats.length;
         totalPrice = totalSeats * findFilmPriceById(filmId);
     }
     document.getElementById("count").innerText = totalSeats;
@@ -80,9 +82,6 @@ const filmModel = [
   
   function selectFilm(filmId) {
       movieSelect.value = filmId;
-      markSeats(filmId);
-  
-      
   }
   
   function resetSeats() {
@@ -94,21 +93,22 @@ const filmModel = [
   function markSeats(filmId) { // funzione che mette i posti selezionati
       resetSeats();
       if (seatsModel[filmId]) { // seasModel non e' vuoto allora procedi
-          const selectedSeats = seatsModel[filmId].seats; // è possibile che seatsModel sia vuoto!! (bisogna supportare questo caso)
+          const selectedSeats = seatsModel[filmId][showDateTime].seats; // è possibile che seatsModel sia vuoto!! (bisogna supportare questo caso)
           for (i= 0; i < selectedSeats.length; i++ ) {
               availableSeats[selectedSeats[i]].classList.add("selected"); // rivedi seleziona gli oggetti in base alle classi
           }
       } 
   }
   // inizio 
-  
+  let showDateTime =  dateInput.value + showtimeInput.value;
   let selectedFilmId = getSelectedFilmIdFromLocalStorage();
   const seatsModel = getSeatsModelFromLocalStorage();
   populateFilmSelector();
   const availableSeats =  document.querySelectorAll(".container .seat"); // prendiamo tutti gli elementi di classe seat che sono contenuti in oggetti di classe container
   selectFilm(selectedFilmId);
-  showTotalInfo(selectedFilmId);
   markSeats(selectedFilmId);
+  showTotalInfo(selectedFilmId);
+ 
   
   movieSelect.onchange = function() { // utilizzare le funzioni richiamate piu' volte in diversi posti dello script
       
@@ -127,32 +127,37 @@ const filmModel = [
       !e.target.classList.contains('occupied') // qui sto verificando se sto cliccando su un elemento che ha classe seat e non ha clsasse occupato
     ) {
         const numberOfSeat = findSeatIndex(e.target);  // in questo if: if(seastModel[numero]) la condizione è vera se nell'oggetto è presente un elemento di numero scitto in parentesi quadre!!!!
-       
+         
+         
         if (seatsModel[selectedFilmId]) // verifica che esita l'id del film nel seatsmodel se c'è aggiungi il posto, se non c'è aggiungi l'id film
         // cambiare il modello e salvare nel local st
         {
-           
-            if(!seatsModel[selectedFilmId].seats.includes(numberOfSeat)) {
-                seatsModel[selectedFilmId].seats.push(numberOfSeat);
-            } else {
-                
-                const indexToRemove = seatsModel[selectedFilmId].seats.indexOf(numberOfSeat); // Trova l'indice dell'elemento 27
+            if(seatsModel[selectedFilmId][showDateTime]) {
+                if(!seatsModel[selectedFilmId][showDateTime].seats.includes(numberOfSeat)) {
+                    seatsModel[selectedFilmId][showDateTime].seats.push(numberOfSeat);
+                } else {
+                    
+                    const indexToRemove = seatsModel[selectedFilmId][showDateTime].seats.indexOf(numberOfSeat); // Trova l'indice dell'elemento 27
 
-                    if (indexToRemove !== -1) {
-                    // Verifica se l'elemento è stato trovato nell'array
-                    seatsModel[selectedFilmId].seats.splice(indexToRemove, 1); // Rimuovi 1 elemento a partire dall'indice indexToRemove
-                }   
+                        if (indexToRemove !== -1) {
+                        // Verifica se l'elemento è stato trovato nell'array
+                        seatsModel[selectedFilmId][showDateTime].seats.splice(indexToRemove, 1); // Rimuovi 1 elemento a partire dall'indice indexToRemove
+                    }   
+
+                }
+            } else {
+                seatsModel[selectedFilmId][showDateTime] = {seats: [numberOfSeat]};
 
             }
         
         } else {
-
-            seatsModel[selectedFilmId] = {seats: [numberOfSeat]};
+            seatsModel[selectedFilmId] = {};
+            seatsModel[selectedFilmId][showDateTime] = {seats: [numberOfSeat]};
         }
         showTotalInfo(selectedFilmId);
         markSeats(selectedFilmId);
         saveSeatsModelToLocalStorage();
-      
+        
     }
   });
  // funzione che mi dice qual e' l 'indice dell'elemento dato
@@ -166,4 +171,14 @@ const filmModel = [
      }
 
   }
-  //seatsModel = {78899: [], 7575757: []} quando ho un oggetto così individuo con seatsModel[numero] l'elemento dell'oggetto seatsModel. Per assegnare un valore bisogna scrivere seatsModel[numero] = [valori array]. in questo if: if(seastModel[numero]) la condizione è vera se nell'oggetto è presente un elemento di numero scitto in parentesi quadre!!!!
+
+  showtimeInput.onchange = updateShowDateTime;
+  dateInput.onchange = updateShowDateTime;
+  function updateShowDateTime() {
+
+    showDateTime =  dateInput.value + showtimeInput.value;
+    markSeats(selectedFilmId);
+    showTotalInfo(selectedFilmId);
+  }
+  /*
+   quando ho un oggetto così individuo con seatsModel[numero] l'elemento dell'oggetto seatsModel. Per assegnare un valore bisogna scrivere seatsModel[numero] = [valori array]. in questo if: if(seastModel[numero]) la condizione è vera se nell'oggetto è presente un elemento di numero scitto in parentesi quadre!!!!*/
