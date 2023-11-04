@@ -9,6 +9,8 @@ const filmModel = [
   //salva il modello dei posti selezionati nel local st.
   const showtimeInput = document.getElementById("time");
   const dateInput = document.getElementById("datepicker");  
+  
+  
   function saveSeatsModelToLocalStorage() {
       localStorage.setItem('seatsModel',JSON.stringify(seatsModel));
     }
@@ -52,6 +54,24 @@ const filmModel = [
           
       });
   }
+
+  // visualizzare l'ultima data selezionata o la data attuale (in mancanza di una precedente scelta memorizzata)
+  function populateDateSelector() {
+    const actualDayFormatted = (new Date()).toISOString().substring(0, 10); // refactr costante inutile serve solo se...
+    if(localStorage.getItem("dateChoice")) {
+        dateInput.value = localStorage.getItem("dateChoice");
+    } else {
+        dateInput.value = actualDayFormatted;
+    }
+    
+  }
+
+  function populateTimeSelector() {
+    if(localStorage.getItem("timeChoice")) {
+        showtimeInput.value = localStorage.getItem("timeChoice");
+    }
+  }
+  localStorage.getItem("timeChoice");
   // funzione che tramite l'id trova il prezzo del film
   function findFilmPriceById(filmId) { 
       for (i = 0; i < filmModel.length; i++) {
@@ -71,7 +91,7 @@ const filmModel = [
     let totalSeats = 0;
     let totalPrice = 0;
   
-    if (seatsModel[filmId]) {
+    if (seatsModel[filmId] && seatsModel[filmId][showDateTime]) {
         totalSeats = seatsModel[filmId][showDateTime].seats.length;
         totalPrice = totalSeats * findFilmPriceById(filmId);
     }
@@ -92,7 +112,7 @@ const filmModel = [
   
   function markSeats(filmId) { // funzione che mette i posti selezionati
       resetSeats();
-      if (seatsModel[filmId]) { // seasModel non e' vuoto allora procedi
+      if (seatsModel[filmId] && seatsModel[filmId][showDateTime]) { // seasModel non e' vuoto allora procedi
           const selectedSeats = seatsModel[filmId][showDateTime].seats; // è possibile che seatsModel sia vuoto!! (bisogna supportare questo caso)
           for (i= 0; i < selectedSeats.length; i++ ) {
               availableSeats[selectedSeats[i]].classList.add("selected"); // rivedi seleziona gli oggetti in base alle classi
@@ -103,12 +123,15 @@ const filmModel = [
   let showDateTime =  dateInput.value + showtimeInput.value;
   let selectedFilmId = getSelectedFilmIdFromLocalStorage();
   const seatsModel = getSeatsModelFromLocalStorage();
+  populateTimeSelector()
   populateFilmSelector();
   const availableSeats =  document.querySelectorAll(".container .seat"); // prendiamo tutti gli elementi di classe seat che sono contenuti in oggetti di classe container
   selectFilm(selectedFilmId);
-  markSeats(selectedFilmId);
+  
+  populateDateSelector();
+  markSeats(selectedFilmId); // unificare queste funzioni
   showTotalInfo(selectedFilmId);
- 
+  updateShowDateTime();
   
   movieSelect.onchange = function() { // utilizzare le funzioni richiamate piu' volte in diversi posti dello script
       
@@ -175,6 +198,8 @@ const filmModel = [
   showtimeInput.onchange = updateShowDateTime;
   dateInput.onchange = updateShowDateTime;
   function updateShowDateTime() {
+    localStorage.setItem("dateChoice", dateInput.value );
+    localStorage.setItem("timeChoice", showtimeInput.value );
 
     showDateTime =  dateInput.value + showtimeInput.value;
     markSeats(selectedFilmId);
