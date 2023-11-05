@@ -92,7 +92,7 @@ const filmModel = [
     let totalPrice = 0;
   
     if (seatsModel[filmId] && seatsModel[filmId][showDateTime]) {
-        totalSeats = seatsModel[filmId][showDateTime].seats.length;
+        totalSeats = seatsModel[filmId][showDateTime].selectedSeats.length;
         totalPrice = totalSeats * findFilmPriceById(filmId);
     }
     document.getElementById("count").innerText = totalSeats;
@@ -105,27 +105,35 @@ const filmModel = [
   }
   
   function resetSeats() {
-      for (i = 0; i < availableSeats.length; i ++) {
-          availableSeats[i].classList.remove("selected");
+      for (i = 0; i < hallSeats.length; i ++) {
+          hallSeats[i].classList.remove("selected");
       }
   }   
   
   function markSeats(filmId) { // funzione che mette i posti selezionati
       resetSeats();
       if (seatsModel[filmId] && seatsModel[filmId][showDateTime]) { // seasModel non e' vuoto allora procedi
-          const selectedSeats = seatsModel[filmId][showDateTime].seats; // è possibile che seatsModel sia vuoto!! (bisogna supportare questo caso)
+          const selectedSeats = seatsModel[filmId][showDateTime].selectedSeats; // è possibile che seatsModel sia vuoto!! (bisogna supportare questo caso)
           for (i= 0; i < selectedSeats.length; i++ ) {
-              availableSeats[selectedSeats[i]].classList.add("selected"); // rivedi seleziona gli oggetti in base alle classi
+              hallSeats[selectedSeats[i]].classList.add("selected"); // rivedi seleziona gli oggetti in base alle classi
+          }
+          const occupiedSeats = seatsModel[filmId][showDateTime].occupiedSeats;
+          if(occupiedSeats) {
+           
+            for (i= 0; i < occupiedSeats.length; i++ ) {
+                hallSeats[occupiedSeats[i]].classList.add("occupied"); 
+            }
           }
       } 
   }
+  
   // inizio 
   let showDateTime =  dateInput.value + showtimeInput.value;
   let selectedFilmId = getSelectedFilmIdFromLocalStorage();
   const seatsModel = getSeatsModelFromLocalStorage();
   populateTimeSelector()
   populateFilmSelector();
-  const availableSeats =  document.querySelectorAll(".container .seat"); // prendiamo tutti gli elementi di classe seat che sono contenuti in oggetti di classe container
+  const hallSeats =  document.querySelectorAll(".container .seat"); // prendiamo tutti gli elementi di classe seat che sono contenuti in oggetti di classe container
   selectFilm(selectedFilmId);
   
   populateDateSelector();
@@ -156,26 +164,26 @@ const filmModel = [
         // cambiare il modello e salvare nel local st
         {
             if(seatsModel[selectedFilmId][showDateTime]) {
-                if(!seatsModel[selectedFilmId][showDateTime].seats.includes(numberOfSeat)) {
-                    seatsModel[selectedFilmId][showDateTime].seats.push(numberOfSeat);
+                if(!seatsModel[selectedFilmId][showDateTime].selectedSeats.includes(numberOfSeat)) {
+                    seatsModel[selectedFilmId][showDateTime].selectedSeats.push(numberOfSeat);
                 } else {
                     
-                    const indexToRemove = seatsModel[selectedFilmId][showDateTime].seats.indexOf(numberOfSeat); // Trova l'indice dell'elemento 27
+                    const indexToRemove = seatsModel[selectedFilmId][showDateTime].selectedSeats.indexOf(numberOfSeat); // Trova l'indice dell'elemento 27
 
                         if (indexToRemove !== -1) {
                         // Verifica se l'elemento è stato trovato nell'array
-                        seatsModel[selectedFilmId][showDateTime].seats.splice(indexToRemove, 1); // Rimuovi 1 elemento a partire dall'indice indexToRemove
+                        seatsModel[selectedFilmId][showDateTime].selectedSeats.splice(indexToRemove, 1); // Rimuovi 1 elemento a partire dall'indice indexToRemove
                     }   
 
                 }
             } else {
-                seatsModel[selectedFilmId][showDateTime] = {seats: [numberOfSeat]};
+                seatsModel[selectedFilmId][showDateTime] = {selectedSeats: [numberOfSeat]};
 
             }
         
         } else {
             seatsModel[selectedFilmId] = {};
-            seatsModel[selectedFilmId][showDateTime] = {seats: [numberOfSeat]};
+            seatsModel[selectedFilmId][showDateTime] = {selectedSeats: [numberOfSeat]};
         }
         showTotalInfo(selectedFilmId);
         markSeats(selectedFilmId);
@@ -186,9 +194,9 @@ const filmModel = [
  // funzione che mi dice qual e' l 'indice dell'elemento dato
 
   function findSeatIndex(seat) {
-    for (i = 0; i< availableSeats.length; i++) {
+    for (i = 0; i< hallSeats.length; i++) {
       
-        if (seat === availableSeats[i]) {
+        if (seat === hallSeats[i]) {
             return i;
         }
      }
@@ -207,3 +215,17 @@ const filmModel = [
   }
   /*
    quando ho un oggetto così individuo con seatsModel[numero] l'elemento dell'oggetto seatsModel. Per assegnare un valore bisogna scrivere seatsModel[numero] = [valori array]. in questo if: if(seastModel[numero]) la condizione è vera se nell'oggetto è presente un elemento di numero scitto in parentesi quadre!!!!*/
+
+   // devo cercare i posti "selezionati" nel modello e aggiungere la proprietà occupied e poi svuotare la proprieta' selected 
+const buyTicketsButton = document.getElementById("buyTickets");  
+buyTicketsButton.addEventListener("click", function() {
+   
+    const selectedSeats = seatsModel[selectedFilmId][showDateTime].selectedSeats;
+    if(selectedSeats) {
+        seatsModel[selectedFilmId][showDateTime].occupiedSeats = selectedSeats.concat(seatsModel[selectedFilmId][showDateTime].occupiedSeats);
+    }
+    markSeats(selectedFilmId);
+  });
+ 
+  
+  
