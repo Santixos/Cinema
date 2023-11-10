@@ -1,5 +1,5 @@
 const filmModel = [
-    {id: 455784, title: "Film bellissimo", price: 0 }, // proprieta' oggetti
+    {id: 455784, title: "Film bellissimo", price: 0 }, // array di  oggetti che hanno proprieta'
     {id: 455785, title: "Film per maniaci", price: 50  },
     {id: 455786, title: "Film noioso", price: 1  },
     {id: 455787, title: "Film orrido", price: 1089  },
@@ -15,7 +15,7 @@ const filmModel = [
       localStorage.setItem('seatsModel',JSON.stringify(seatsModel));
     }
     
-    // funzione che dal localst. acquisisce i posti selezionati
+    // funzione che dal localst. acquisisce i posti selezionati e occupati
   function getSeatsModelFromLocalStorage() {
     const modelString = localStorage.getItem('seatsModel');
     if (modelString) { // e' true quando non è vuoto
@@ -28,7 +28,7 @@ const filmModel = [
   }
   // salvo nel localSt. l'id dell'ultimo film seleionato
   function saveFilmIdToLocalStorage() {
-      localStorage.setItem('selectedFilmId',selectedFilmId); 
+      localStorage.setItem('selectedFilmId', selectedFilmId); 
     }
     
   //prendo dal localst. l'id del film selezionato  
@@ -36,9 +36,9 @@ const filmModel = [
       // l'uscita deve essere il numero dell'id qundi usare il +
       //per verificare che funziona bene devo aprire la console e scrivere selectefilmid e deve corripondere
   
-      const modelString = localStorage.getItem('selectedFilmId');
-      if (modelString) {
-          return +modelString;
+      const selectedFilmIdString = localStorage.getItem('selectedFilmId');
+      if (selectedFilmIdString) {
+          return +selectedFilmIdString;
       }
       return filmModel[0].id;
   
@@ -57,12 +57,13 @@ const filmModel = [
 
   // visualizzare l'ultima data selezionata o la data attuale (in mancanza di una precedente scelta memorizzata)
   function populateDateSelector() {
-    const actualDayFormatted = (new Date()).toISOString().substring(0, 10); // refactr costante inutile serve solo se...
+    const actualDayFormatted = (new Date()).toISOString().substring(0, 10);
+    dateInput.setAttribute("min", actualDayFormatted);
     if(localStorage.getItem("dateChoice")) {
         dateInput.value = localStorage.getItem("dateChoice");
     } else {
         dateInput.value = actualDayFormatted;
-    }
+    }/// contollo data minima
     
   }
 
@@ -71,18 +72,22 @@ const filmModel = [
         showtimeInput.value = localStorage.getItem("timeChoice");
     }
   }
-  localStorage.getItem("timeChoice");
+  
   // funzione che tramite l'id trova il prezzo del film
   function findFilmPriceById(filmId) { 
       for (i = 0; i < filmModel.length; i++) {
           if (filmModel[i].id === filmId) {
           return filmModel[i].price;
           }
+         
       }
+      return "not available";
   /*
   1) all'inzio di showtotalinfo definisco le variabili totalSEats e totalprice e le setto = 0
   2) definisco un if che verifica se seatsModel[filmId] esiste 
         se sesite riempio lo "show total" e se e' vuoto non faccio niente (0 posti 0 euro)
+        fondi funzioni 
+        controllo sulla data
   */
 
   } 
@@ -111,7 +116,7 @@ const filmModel = [
       }
   }   
   
-  function markSeats(filmId) { // funzione che mette i posti selezionati
+  function markSeats(filmId) { // funzione che mette i posti selezionati e occupati a seconda delle scelte memrizzate nel localstorage
       resetSeats();
       if (seatsModel[filmId] && seatsModel[filmId][showDateTime]) { // seasModel non e' vuoto allora procedi
           const selectedSeats = seatsModel[filmId][showDateTime].selectedSeats; // è possibile che seatsModel sia vuoto!! (bisogna supportare questo caso)
@@ -153,7 +158,7 @@ const filmModel = [
   // Seat click event
   
   document.querySelector(".container").addEventListener('click', e => {
-  
+    console.log(e);
     if (
       e.target.classList.contains('seat') &&
       !e.target.classList.contains('occupied') // qui sto verificando se sto cliccando su un elemento che ha classe seat e non ha clsasse occupato
@@ -178,7 +183,7 @@ const filmModel = [
 
                 }
             } else {
-                seatsModel[selectedFilmId][showDateTime] = {selectedSeats: [numberOfSeat]};
+                seatsModel[selectedFilmId][showDateTime] = {selectedSeats: [numberOfSeat]}; // qui nasce laproprietà selectedseats
 
             }
         
@@ -202,7 +207,7 @@ const filmModel = [
         }
      }
 
-  }
+  } /// riprendi analisi qui
 
   showtimeInput.onchange = updateShowDateTime;
   dateInput.onchange = updateShowDateTime;

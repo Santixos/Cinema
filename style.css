@@ -114,6 +114,5 @@ p.text span {
   color: #6feaf6;
 }
 #buyTickets {
-  margin-top: 20px; /* Puoi regolare il valore in base a quanto vuoi spostare il pulsante verso il basso */
-  margin-left: 100px;
+ margin-top: 3em;
 }
