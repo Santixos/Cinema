@@ -207,7 +207,7 @@ const filmModel = [
         }
      }
 
-  } /// riprendi analisi qui
+  } 
 
   showtimeInput.onchange = updateShowDateTime;
   dateInput.onchange = updateShowDateTime;
@@ -229,11 +229,13 @@ buyTicketsButton.addEventListener("click", function() {
     const selectedSeats = seatsModel[selectedFilmId][showDateTime].selectedSeats;
     if(selectedSeats) {
         let occupiedSeats = seatsModel[selectedFilmId][showDateTime].occupiedSeats;
-       if(occupiedSeats) { // se esistono già posti occupati allora rendi i posti occupati uguali alla concatenzione fra i posti occupati e quelli selezionati
-        seatsModel[selectedFilmId][showDateTime].occupiedSeats = selectedSeats.concat(occupiedSeats);}
-        else {
+        
+        if(occupiedSeats) { // se esistono già posti occupati allora rendi i posti occupati uguali alla concatenzione fra i posti occupati e quelli selezionati
+            seatsModel[selectedFilmId][showDateTime].occupiedSeats = selectedSeats.concat(occupiedSeats);
+        
+        } else {
             seatsModel[selectedFilmId][showDateTime].occupiedSeats = selectedSeats;
-             
+
         }
         seatsModel[selectedFilmId][showDateTime].selectedSeats =[];
         saveSeatsModelToLocalStorage();
