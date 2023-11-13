@@ -131,6 +131,7 @@ const filmModel = [
             }
           }
       } 
+      showTotalInfo(filmId);
   }
   
   // inizio 
@@ -144,14 +145,12 @@ const filmModel = [
   
   populateDateSelector();
   markSeats(selectedFilmId); // unificare queste funzioni
-  showTotalInfo(selectedFilmId);
   updateShowDateTime();
   
   movieSelect.onchange = function() { // utilizzare le funzioni richiamate piu' volte in diversi posti dello script
       
       selectedFilmId = +movieSelect.value;
       saveFilmIdToLocalStorage();
-      showTotalInfo(selectedFilmId);
       markSeats(selectedFilmId);
   }
 
@@ -191,7 +190,7 @@ const filmModel = [
             seatsModel[selectedFilmId] = {};
             seatsModel[selectedFilmId][showDateTime] = {selectedSeats: [numberOfSeat]};
         }
-        showTotalInfo(selectedFilmId);
+        
         markSeats(selectedFilmId);
         saveSeatsModelToLocalStorage();
         
@@ -217,7 +216,7 @@ const filmModel = [
 
     showDateTime =  dateInput.value + showtimeInput.value;
     markSeats(selectedFilmId);
-    showTotalInfo(selectedFilmId);
+    
   }
   /*
    quando ho un oggetto così individuo con seatsModel[numero] l'elemento dell'oggetto seatsModel. Per assegnare un valore bisogna scrivere seatsModel[numero] = [valori array]. in questo if: if(seastModel[numero]) la condizione è vera se nell'oggetto è presente un elemento di numero scitto in parentesi quadre!!!!*/
@@ -243,7 +242,7 @@ buyTicketsButton.addEventListener("click", function() {
     }
     
     markSeats(selectedFilmId);
-    showTotalInfo(selectedFilmId);
+    
   });
  
   
